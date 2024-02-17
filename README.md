@@ -1,4 +1,4 @@
-# ufabc_class_algorithms
+# UFABC - Class Algorithms
 
 ## Description
 
