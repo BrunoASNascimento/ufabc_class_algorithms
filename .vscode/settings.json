@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        ".coveragerc": "plaintext",
+        "stdio.h": "c"
+    }
+}
