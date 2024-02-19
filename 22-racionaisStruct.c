@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-struct tRacional racional(int, int); // Function prototype
+struct tRacional racional(int, int); 
 struct tRacional negativo(struct tRacional);
 struct tRacional soma(struct tRacional, struct tRacional);
 struct tRacional multiplica(struct tRacional, struct tRacional);
@@ -12,7 +12,7 @@ struct tRacional
 {
     int n;
     int d;
-}; // Forward declaration
+}; 
 
 struct tRacional racional(int n, int d) {
     struct tRacional r;
@@ -23,28 +23,28 @@ struct tRacional racional(int n, int d) {
 
 struct tRacional soma(struct tRacional r1, struct tRacional r2) {
     struct tRacional result;
-    result.n = r1.n * r2.d + r2.n * r1.d; // Cross-multiplication for adding fractions
-    result.d = r1.d * r2.d; // Multiply the denominators
+    result.n = r1.n * r2.d + r2.n * r1.d; 
+    result.d = r1.d * r2.d; 
     return result;
 }
 
 struct tRacional multiplica(struct tRacional r1, struct tRacional r2) {
     struct tRacional result;
-    result.n = r1.n *  r2.n ; // Cross-multiplication for adding fractions
-    result.d = r1.d * r2.d; // Multiply the denominators
+    result.n = r1.n *  r2.n ; 
+    result.d = r1.d * r2.d; 
     return result;
 }
 
 struct tRacional divide(struct tRacional r1, struct tRacional r2) {
     struct tRacional result;
-    result.n = r1.n * r2.d ; // Cross-multiplication for adding fractions
-    result.d = r1.d * r2.n; // Multiply the denominators
+    result.n = r1.n * r2.d ; 
+    result.d = r1.d * r2.n; 
     return result;
 }
 struct tRacional negativo(struct tRacional r) {
     struct tRacional result;
-    result.n = -r.n; // Flip the sign of the numerator
-    result.d = r.d; // Keep the same denominator
+    result.n = -r.n; 
+    result.d = r.d; 
     return result;
 }
 int gcd(int a, int b) {
