@@ -1,84 +1,91 @@
 #include <stdio.h>
-#include <stdlib.h>
 
-struct tComplex
+typedef struct
 {
-    int n;
-    int d;
-};
+    int real;
+    int imag;
+} tComplex;
 
-struct tComplex complexo(int, int);
-struct tComplex soma(struct tComplex, struct tComplex);
-struct tComplex subtrai(struct tComplex, struct tComplex);
-struct tComplex multiplica(struct tComplex, struct tComplex);
-struct tComplex divide(struct tComplex, struct tComplex);
-
-struct tComplex complexo(int n, int d)
+tComplex complexo(int real, int imag)
 {
-    struct tComplex r;
-    r.n = n;
-    r.d = d;
-    return r;
+    tComplex c;
+    c.real = real;
+    c.imag = imag;
+    return c;
 }
 
-struct tComplex soma(struct tComplex r1, struct tComplex r2)
+tComplex soma(tComplex c1, tComplex c2)
 {
-    struct tComplex result;
-    result.n = r1.n * r2.d + r2.n * r1.d;
-    result.d = r1.d * r2.d;
-    return result;
+    tComplex resultado;
+    resultado.real = c1.real + c2.real;
+    resultado.imag = c1.imag + c2.imag;
+    return resultado;
 }
 
-struct tComplex subtrai(struct tComplex r1, struct tComplex r2)
+tComplex subtrai(tComplex c1, tComplex c2)
 {
-    struct tComplex result;
-    result.n = r1.n * r2.d - r2.n * r1.d;
-    result.d = r1.d * r2.d;
-    return result;
+    tComplex resultado;
+    resultado.real = c1.real - c2.real;
+    resultado.imag = c1.imag - c2.imag;
+    return resultado;
 }
 
-struct tComplex multiplica(struct tComplex r1, struct tComplex r2)
+tComplex multiplica(tComplex c1, tComplex c2)
 {
-    struct tComplex result;
-    result.n = r1.n * r2.n;
-    result.d = r1.d * r2.d;
-    return result;
+    tComplex resultado;
+    resultado.real = c1.real * c2.real - c1.imag * c2.imag;
+    resultado.imag = c1.real * c2.imag + c1.imag * c2.real;
+    return resultado;
 }
 
-struct tComplex divide(struct tComplex r1, struct tComplex r2)
+tComplex divide(tComplex c1, tComplex c2)
 {
-    struct tComplex result;
-    result.n = r1.n * r2.d;
-    result.d = r1.d * r2.n;
-    return result;
+    tComplex resultado;
+    int divisor = c2.real * c2.real + c2.imag * c2.imag;
+    if (divisor == 0)
+    {
+        printf("Divisão por zero não é permitida.\n");
+        resultado.real = 0;
+        resultado.imag = 0;
+        return resultado;
+    }
+    resultado.real = (c1.real * c2.real + c1.imag * c2.imag) / divisor;
+    resultado.imag = (c1.imag * c2.real - c1.real * c2.imag) / divisor;
+    return resultado;
 }
 
 int main()
 {
+    tComplex c1, c2, resultado;
+    char operador;
+    int A, B, C, D;
 
-    int n1, d1, n2, d2;
-    char op;
-    while (scanf("%d %d %c %d %d", &n1, &d1, &op, &n2, &d2) != EOF)
+    while (scanf("%d %di %c %d %di", &A, &B, &operador, &C, &D) != EOF)
     {
-        struct tComplex r1 = complexo(n1, d1);
-        struct tComplex r2 = complexo(n2, d2);
-        struct tComplex result;
-        switch (op)
+        c1 = complexo(A, B);
+        c2 = complexo(C, D);
+
+        switch (operador)
         {
         case '+':
-            result = soma(r1, r2);
+            resultado = soma(c1, c2);
             break;
         case '-':
-            result = subtrai(r1, r2);
+            resultado = subtrai(c1, c2);
             break;
         case '*':
-            result = multiplica(r1, r2);
+            resultado = multiplica(c1, c2);
             break;
         case '/':
-            result = divide(r1, r2);
+            resultado = divide(c1, c2);
             break;
+        default:
+            printf("Operador inválido.\n");
+            continue;
         }
 
-        printf("%d %d\n", result.n, result.d);
+        printf("%d %di\n", resultado.real, resultado.imag);
     }
+
+    return 0;
 }
