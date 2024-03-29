@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Recebe um vetor e o seu tamanho.
-// Imprime o conteudo do vetor.
 void imprimir(int *v, int n)
 {
     for (int i = 0; i < n; i++)
@@ -12,10 +10,6 @@ void imprimir(int *v, int n)
     printf("\n");
 }
 
-// Recebe um vetor bipartido: v[e..m-1] e v[m..d-1] ordenados.
-// Intercala os elementos de modo que v[e..d-1] fique ordenado.
-// Usa um vetor auxiliar de tamanho n = d-e.
-// Imprima o conteudo do vetor auxiliar antes de liberar a memoria e finalizar o procedimento.
 void intercala(int *v, int e, int m, int d)
 {
     int *aux = malloc(sizeof(int) * (d - e));
@@ -52,7 +46,6 @@ void intercala(int *v, int e, int m, int d)
     free(aux);
 }
 
-// Recebe um vetor v[e..d-1] e ordena recursivamente.
 void mergeSortR(int *v, int e, int d)
 {
     if (d - e > 1)
@@ -64,8 +57,6 @@ void mergeSortR(int *v, int e, int d)
     }
 }
 
-// Recebe um vetor e o seu tamanho.
-// Ordena o vetor com o algoritmo mergeSort.
 void mergeSort(int *v, int n)
 {
     mergeSortR(v, 0, n);

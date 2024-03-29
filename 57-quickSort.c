@@ -60,6 +60,7 @@ int main()
         scanf("%d", &v[i]);
     }
     quickSort(v, n);
+    imprimir(v, 0, n);
     free(v);
     return 0;
 }

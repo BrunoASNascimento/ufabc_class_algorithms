@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// Função para intercalar dois vetores ordenados
 int *intercala(int *v1, int *v2, int q1, int q2)
 {
     int *Vr = malloc((q1 + q2) * sizeof(int));
     int i = 0, j = 0, k = 0;
 
-    // Intercalação dos vetores
     while (i < q1 && j < q2)
     {
         if (v1[i] < v2[j])
@@ -20,13 +18,11 @@ int *intercala(int *v1, int *v2, int q1, int q2)
         }
     }
 
-    // Copia os elementos restantes de v1, se houver
     while (i < q1)
     {
         Vr[k++] = v1[i++];
     }
 
-    // Copia os elementos restantes de v2, se houver
     while (j < q2)
     {
         Vr[k++] = v2[j++];

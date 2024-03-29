@@ -18,19 +18,16 @@ void intercala(int *v, int q1, int q2)
         }
     }
 
-    // Copia o restante dos elementos de v[i..q1-1], se houver
     while (i < q1)
     {
         Vaux[k++] = v[i++];
     }
 
-    // Copia o restante dos elementos de v[j..q1+q2-1], se houver
     while (j < q1 + q2)
     {
         Vaux[k++] = v[j++];
     }
 
-    // Copia os elementos de volta para o vetor original
     for (i = 0; i < q1 + q2; i++)
     {
         v[i] = Vaux[i];
