@@ -25,3 +25,23 @@ To compile and run:
 gcc filename.c -o filename -lm
 ./filename
 ```
+
+## For revision:
+### Total:
+- 38-fila.c
+- 39-filaCircular.c
+- 40-LESint.c
+- 41-LESchar.c
+- 45-pilha.c
+- 46-fila.c
+- 47-ldde.c
+- 49-balizamento2.c
+- 59-maxHeap2.c
+- 67-mostraFolhas.c
+- 73-arvoreBin3.c
+- 74-arvoreBin4.c
+### Partial:
+- 35-balizamento.c
+- 36-les.c
+- 68-sucessor.c
+- 69-antecessor.c
