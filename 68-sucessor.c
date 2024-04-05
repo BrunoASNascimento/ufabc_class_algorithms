@@ -65,7 +65,8 @@ void inserir(Arvore *arv, int x)
 Item *sucessor(Item *i)
 {
     if (i->dir != NULL)
-    {
+    {   
+        // printf("i->dir->chave: %d\n", i->dir->chave);
         Item *curr = i->dir;
         while (curr->esq != NULL)
         {
@@ -74,12 +75,14 @@ Item *sucessor(Item *i)
         return curr;
     }
     Item *p = i->pai;
-    while (p != NULL && i == p->dir)
+    // printf("p->chave: %d\n", p->chave);
+    while (p != NULL && i == p->dir )
     {
+        // printf("p->chave while: %d\n", p->chave);
         i = p;
         p = p->pai;
     }
-    return p;
+    // return p;
 }
 
 void imprimirInOrdem(Item *raiz)
@@ -144,3 +147,50 @@ int main()
     liberaArvore(arv);
     return 0;
 }
+
+
+// --- Input ---
+// 7
+// 3 2 5 1 4 6 7
+// 1
+// 2
+// 3
+// 4
+// 5
+// 6
+// 7
+// 8
+
+// --- Program output ---
+// Nao ha sucessor para a chave pesquisada.
+// Sucessor de 2: 5
+// Sucessor de 3: 4
+// Sucessor de 4: 6
+// Sucessor de 5: 6
+// Sucessor de 6: 7
+// Nao ha sucessor para a chave pesquisada.
+// Chave nao encontrada.
+// libera: 1
+// libera: 2
+// libera: 4
+// libera: 7
+// libera: 6
+// libera: 5
+// libera: 3
+
+// --- Expected output (text)---
+// Nao ha sucessor para a chave pesquisada.
+// Nao ha sucessor para a chave pesquisada.
+// Sucessor de 3: 4
+// Nao ha sucessor para a chave pesquisada.
+// Sucessor de 5: 6
+// Sucessor de 6: 7
+// Nao ha sucessor para a chave pesquisada.
+// Chave nao encontrada.
+// libera: 1
+// libera: 2
+// libera: 4
+// libera: 7
+// libera: 6
+// libera: 5
+// libera: 3

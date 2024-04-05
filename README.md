@@ -35,7 +35,6 @@ gcc filename.c -o filename -lm
 - 45-pilha.c
 - 46-fila.c
 - 47-ldde.c
-- 49-balizamento2.c
 - 59-maxHeap2.c
 - 67-mostraFolhas.c
 - 73-arvoreBin3.c
