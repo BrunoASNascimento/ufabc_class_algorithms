@@ -41,7 +41,5 @@ gcc filename.c -o filename -lm
 - 73-arvoreBin3.c
 - 74-arvoreBin4.c
 ### Partial:
-- 35-balizamento.c
-- 36-les.c
 - 68-sucessor.c
 - 69-antecessor.c
