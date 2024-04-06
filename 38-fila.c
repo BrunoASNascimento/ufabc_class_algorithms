@@ -3,9 +3,9 @@
 
 typedef struct tFila
 {
-    int *itens;
-    int inicio, fim;
-    int tamanho;
+    int *itens;      
+    int inicio, fim; 
+    int tamanho;     
 } Fila;
 
 Fila *criaFilaVazia(int tamanho)
@@ -13,7 +13,7 @@ Fila *criaFilaVazia(int tamanho)
     Fila *fila = (Fila *)malloc(sizeof(Fila));
     fila->itens = (int *)malloc(tamanho * sizeof(int));
     fila->inicio = 0;
-    fila->fim = -1;
+    fila->fim = 0;
     fila->tamanho = tamanho;
     return fila;
 }
@@ -31,32 +31,31 @@ int cheia(Fila *fila)
 
 int vazia(Fila *fila)
 {
-    return fila->fim < fila->inicio;
+    return fila->inicio == fila->fim;
 }
 
 void enfileirar(Fila *fila, int x)
 {
-    if (cheia(fila))
-        return;
-    fila->fim = (fila->fim + 1) % fila->tamanho;
-    fila->itens[fila->fim] = x;
+    if (!cheia(fila))
+    {
+        fila->itens[fila->fim] = x;
+        fila->fim = (fila->fim + 1) % fila->tamanho;
+    }
 }
 
 int desenfileirar(Fila *fila)
 {
-    if (vazia(fila))
-        return -1;
-    int valor = fila->itens[fila->inicio];
-    if (fila->inicio == fila->fim)
+    if (!vazia(fila))
     {
-        fila->inicio = 0;
-        fila->fim = -1;
-    }
-    else
-    {
+        int valor = fila->itens[fila->inicio];
         fila->inicio = (fila->inicio + 1) % fila->tamanho;
+        if (fila->inicio == fila->fim)
+        { 
+            fila->inicio = fila->fim = 0;
+        }
+        return valor;
     }
-    return valor;
+    return -1;
 }
 
 int main()
@@ -64,7 +63,6 @@ int main()
     int n, x;
     char op;
     scanf("%d", &n);
-
     Fila *fila = criaFilaVazia(n);
 
     while (scanf(" %c", &op) != EOF)
@@ -76,10 +74,10 @@ int main()
         }
         else if (op == 'D')
         {
-            int removido = desenfileirar(fila);
-            if (removido != -1)
+            int desenfileirado = desenfileirar(fila);
+            if (desenfileirado != -1)
             {
-                printf("%d\n", removido);
+                printf("%d\n", desenfileirado);
             }
         }
     }

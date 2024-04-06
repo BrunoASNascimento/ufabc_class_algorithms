@@ -13,109 +13,195 @@ typedef struct tLista
     int quantidade;
 } Lista;
 
+/**
+ * Cria uma lista vazia.
+ * 
+ * @return Um ponteiro para a lista vazia.
+ */
 Lista *criaListaVazia()
 {
     Lista *lista = (Lista *)malloc(sizeof(Lista));
-    lista->primeiro = NULL;
-    lista->ultimo = NULL;
+    lista->primeiro = lista->ultimo = NULL;
     lista->quantidade = 0;
     return lista;
 }
 
+/**
+ * Cria um novo item com a chave especificada.
+ * 
+ * @param x A chave do novo item.
+ * @return Um ponteiro para o novo item.
+ */
 Item *criaItem(int x)
 {
     Item *novoItem = (Item *)malloc(sizeof(Item));
     novoItem->chave = x;
-    novoItem->ant = NULL;
-    novoItem->prox = NULL;
+    novoItem->ant = novoItem->prox = NULL;
     return novoItem;
 }
 
+/**
+ * Libera a memória alocada para a lista.
+ * 
+ * @param lista Um ponteiro para a lista.
+ */
 void liberaLista(Lista *lista)
 {
-    Item *item = lista->primeiro;
-    while (item != NULL)
+    Item *atual = lista->primeiro;
+    while (atual != NULL)
     {
-        Item *temp = item;
-        item = item->prox;
+        Item *temp = atual;
+        atual = atual->prox;
         free(temp);
     }
     free(lista);
 }
 
+/**
+ * Verifica se a lista está vazia.
+ * 
+ * @param lista Um ponteiro para a lista.
+ * @return 1 se a lista estiver vazia, 0 caso contrário.
+ */
 int vazia(Lista *lista)
 {
     return lista->primeiro == NULL;
 }
 
+/**
+ * Imprime os elementos da lista.
+ * 
+ * @param lista Um ponteiro para a lista.
+ */
 void imprimir(Lista *lista)
 {
-    Item *item = lista->primeiro;
-    while (item != NULL)
+    Item *atual = lista->primeiro;
+    while (atual != NULL)
     {
-        printf("%d ", item->chave);
-        item = item->prox;
+        printf("%d ", atual->chave);
+        atual = atual->prox;
     }
     printf("\n");
 }
 
+/**
+ * Imprime os elementos da lista em ordem reversa.
+ * 
+ * @param lista Um ponteiro para a lista.
+ */
 void imprimirReverso(Lista *lista)
 {
-    Item *item = lista->ultimo;
-    while (item != NULL)
+    Item *atual = lista->ultimo;
+    while (atual != NULL)
     {
-        printf("%d ", item->chave);
-        item = item->ant;
+        printf("%d ", atual->chave);
+        atual = atual->ant;
     }
     printf("\n");
 }
 
+/**
+ * Insere um novo elemento na lista.
+ * 
+ * @param lista Um ponteiro para a lista.
+ * @param x A chave do novo elemento a ser inserido.
+ */
 void inserir(Lista *lista, int x)
 {
     Item *novoItem = criaItem(x);
+
+    // Lista vazia
     if (vazia(lista))
     {
-        lista->primeiro = novoItem;
-        lista->ultimo = novoItem;
+        lista->primeiro = lista->ultimo = novoItem;
     }
     else
     {
-        novoItem->prox = NULL;
-        novoItem->ant = lista->ultimo;
-        lista->ultimo->prox = novoItem;
-        lista->ultimo = novoItem;
+        // Inserção ordenada
+        Item *atual = lista->primeiro;
+        while (atual != NULL && atual->chave < x)
+        {
+            atual = atual->prox;
+        }
+        if (atual == lista->primeiro)
+        {
+            // Inserção no início
+            novoItem->prox = lista->primeiro;
+            lista->primeiro->ant = novoItem;
+            lista->primeiro = novoItem;
+        }
+        else if (atual == NULL)
+        {
+            // Inserção no fim
+            novoItem->ant = lista->ultimo;
+            lista->ultimo->prox = novoItem;
+            lista->ultimo = novoItem;
+        }
+        else
+        {
+            // Inserção no meio
+            novoItem->prox = atual;
+            novoItem->ant = atual->ant;
+            atual->ant->prox = novoItem;
+            atual->ant = novoItem;
+        }
     }
     lista->quantidade++;
 }
 
+/**
+ * Remove um elemento da lista.
+ * 
+ * @param lista Um ponteiro para a lista.
+ * @param x A chave do elemento a ser removido.
+ */
 void remover(Lista *lista, int x)
 {
-    if (vazia(lista))
-        return;
-    Item *item = lista->primeiro;
-    while (item != NULL && item->chave != x)
+    Item *atual = lista->primeiro;
+    while (atual != NULL && atual->chave != x)
     {
-        item = item->prox;
+        atual = atual->prox;
     }
-    if (item == NULL)
-        return;
-    if (item->ant != NULL)
-        item->ant->prox = item->prox;
+    if (atual == NULL)
+    {
+        return; // Não encontrado
+    }
+
+    if (atual == lista->primeiro)
+    {
+        lista->primeiro = atual->prox;
+        if (lista->primeiro != NULL)
+        {
+            lista->primeiro->ant = NULL;
+        }
+    }
     else
-        lista->primeiro = item->prox;
-    if (item->prox != NULL)
-        item->prox->ant = item->ant;
+    {
+        atual->ant->prox = atual->prox;
+    }
+    if (atual == lista->ultimo)
+    {
+        lista->ultimo = atual->ant;
+        if (lista->ultimo != NULL)
+        {
+            lista->ultimo->prox = NULL;
+        }
+    }
     else
-        lista->ultimo = item->ant;
-    free(item);
+    {
+        atual->prox->ant = atual->ant;
+    }
+
+    free(atual);
     lista->quantidade--;
 }
 
 int main()
 {
-    Lista *lista = criaListaVazia();
     char op;
     int x;
+    Lista *lista = criaListaVazia();
+
     while (scanf(" %c", &op) != EOF)
     {
         switch (op)
@@ -136,6 +222,7 @@ int main()
             break;
         }
     }
+
     liberaLista(lista);
     return 0;
 }

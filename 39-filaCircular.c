@@ -13,7 +13,7 @@ FilaCircular *criaFilaCircularVazia(int tamanho)
     FilaCircular *fila = (FilaCircular *)malloc(sizeof(FilaCircular));
     fila->itens = (int *)malloc(tamanho * sizeof(int));
     fila->inicio = 0;
-    fila->fim = -1;
+    fila->fim = 0; // Inicializa fim no mesmo lugar que inicio
     fila->tamanho = tamanho;
     return fila;
 }
@@ -26,20 +26,20 @@ void liberaFilaCircular(FilaCircular *fila)
 
 int cheia(FilaCircular *fila)
 {
-    return (fila->fim + 1) % fila->tamanho == fila->inicio;
+    return ((fila->fim + 1) % fila->tamanho) == fila->inicio;
 }
 
 int vazia(FilaCircular *fila)
 {
-    return fila->inicio == (fila->fim + 1) % fila->tamanho;
+    return fila->inicio == fila->fim;
 }
 
 void enfileirar(FilaCircular *fila, int x)
 {
     if (!cheia(fila))
     {
-        fila->fim = (fila->fim + 1) % fila->tamanho;
         fila->itens[fila->fim] = x;
+        fila->fim = (fila->fim + 1) % fila->tamanho; // Atualiza o fim circularmente
     }
 }
 
@@ -48,15 +48,7 @@ int desenfileirar(FilaCircular *fila)
     if (!vazia(fila))
     {
         int valor = fila->itens[fila->inicio];
-        if (fila->inicio == fila->fim)
-        {
-            fila->inicio = 0;
-            fila->fim = -1;
-        }
-        else
-        {
-            fila->inicio = (fila->inicio + 1) % fila->tamanho;
-        }
+        fila->inicio = (fila->inicio + 1) % fila->tamanho; // Atualiza o inicio circularmente
         return valor;
     }
     return -1;
@@ -64,25 +56,23 @@ int desenfileirar(FilaCircular *fila)
 
 int main()
 {
-    int n, x;
-    char op;
-    scanf("%d", &n);
+    int N, x;
+    char operacao;
+    scanf("%d", &N);
+    FilaCircular *fila = criaFilaCircularVazia(N);
 
-    FilaCircular *fila = criaFilaCircularVazia(n);
-
-    while (scanf(" %c", &op) != EOF)
+    while (scanf(" %c %d", &operacao, &x) != EOF)
     {
-        if (op == 'E')
+        if (operacao == 'E')
         {
-            scanf("%d", &x);
             enfileirar(fila, x);
         }
-        else if (op == 'D')
+        else if (operacao == 'D')
         {
-            int valor = desenfileirar(fila);
-            if (valor != -1)
+            int desenfileirado = desenfileirar(fila);
+            if (desenfileirado != -1)
             {
-                printf("%d\n", valor);
+                printf("%d\n", desenfileirado);
             }
         }
     }

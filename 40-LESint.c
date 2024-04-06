@@ -1,99 +1,134 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MAX 30000
+
 typedef struct
 {
-    int *itens;
-    int tamanho;
-    int quantidade;
-} LES;
+    int itens[MAX];
+    int qtd;
+} Lista;
 
-LES *criaLES(int tamanho)
+/**
+ * Initializes the list by setting the quantity of items to zero.
+ * 
+ * @param lista The list to be initialized.
+ */
+void criaLista(Lista *lista)
 {
-    LES *les = (LES *)malloc(sizeof(LES));
-    les->itens = (int *)malloc(tamanho * sizeof(int));
-    les->tamanho = tamanho;
-    les->quantidade = 0;
-    return les;
+    lista->qtd = 0;
 }
 
-void liberaLES(LES *les)
+/**
+ * Searches for a value in the list.
+ * 
+ * @param lista The list to be searched.
+ * @param valor The value to be searched for.
+ * @return The position of the value if found, -1 otherwise.
+ */
+int busca(Lista *lista, int valor)
 {
-    free(les->itens);
-    free(les);
-}
-
-int buscaLES(LES *les, int valor)
-{
-    for (int i = 0; i < les->quantidade; i++)
+    for (int i = 0; i < lista->qtd; i++)
     {
-        if (les->itens[i] == valor)
+        if (lista->itens[i] == valor)
         {
-            return i;
+            return i; // Returns the position if the value is found
         }
     }
-    return -1;
+    return -1; // Returns -1 if the value is not found
 }
 
-void insereLES(LES *les, int valor)
+/**
+ * Inserts a value into the list if it is not already present and the list is not full.
+ * 
+ * @param lista The list to insert the value into.
+ * @param valor The value to be inserted.
+ */
+void insere(Lista *lista, int valor)
 {
-    if (les->quantidade < les->tamanho && buscaLES(les, valor) == -1)
+    if (lista->qtd >= MAX || busca(lista, valor) != -1)
     {
-        les->itens[les->quantidade++] = valor;
+        return; // Ignores if the list is full or the value already exists
     }
-}
 
-void removeLES(LES *les, int valor)
-{
-    int posicao = buscaLES(les, valor);
-    if (posicao != -1)
+    // Ordered insertion
+    int pos;
+    for (pos = lista->qtd; pos > 0 && lista->itens[pos - 1] > valor; pos--)
     {
-        for (int i = posicao; i < les->quantidade - 1; i++)
-        {
-            les->itens[i] = les->itens[i + 1];
-        }
-        les->quantidade--;
+        lista->itens[pos] = lista->itens[pos - 1];
     }
+    lista->itens[pos] = valor;
+    lista->qtd++;
 }
 
-void mostraLES(LES *les)
+/**
+ * Removes a value from the list if it exists.
+ * 
+ * @param lista The list to remove the value from.
+ * @param valor The value to be removed.
+ */
+void removeValor(Lista *lista, int valor)
 {
-    for (int i = 0; i < les->quantidade; i++)
+    int pos = busca(lista, valor);
+    if (pos == -1)
     {
-        printf("%d ", les->itens[i]);
+        return; // Ignores if the value is not found
+    }
+
+    for (int i = pos; i < lista->qtd - 1; i++)
+    {
+        lista->itens[i] = lista->itens[i + 1];
+    }
+    lista->qtd--;
+}
+
+/**
+ * Prints the values in the list.
+ * 
+ * @param lista The list to be printed.
+ */
+void imprimeLista(Lista *lista)
+{
+    for (int i = 0; i < lista->qtd; i++)
+    {
+        printf("%d ", lista->itens[i]);
     }
     printf("\n");
 }
 
 int main()
 {
-    int N, valor;
-    char operacao;
+    int N;
     scanf("%d", &N);
-    LES *les = criaLES(N);
+
+    Lista lista;
+    criaLista(&lista);
+
+    char operacao;
+    int valor;
 
     while (scanf(" %c", &operacao) != EOF)
     {
-        switch (operacao)
+        if (operacao == 'I')
         {
-        case 'I':
             scanf("%d", &valor);
-            insereLES(les, valor);
-            break;
-        case 'R':
+            insere(&lista, valor);
+        }
+        else if (operacao == 'R')
+        {
             scanf("%d", &valor);
-            removeLES(les, valor);
-            break;
-        case 'B':
+            removeValor(&lista, valor);
+        }
+        else if (operacao == 'B')
+        {
             scanf("%d", &valor);
-            printf("%s\n", buscaLES(les, valor) != -1 ? "SIM" : "NAO");
-            break;
-        case 'M':
-            mostraLES(les);
-            break;
+            printf("%s\n", busca(&lista, valor) != -1 ? "SIM" : "NAO");
+        }
+        else if (operacao == 'M')
+        {
+            imprimeLista(&lista);
         }
     }
 
-    liberaLES(les);
     return 0;
 }

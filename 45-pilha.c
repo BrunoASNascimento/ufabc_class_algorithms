@@ -13,14 +13,25 @@ typedef struct tPilha
     int quantidade;
 } Pilha;
 
+/**
+ * Creates an empty stack.
+ * 
+ * @return A pointer to the newly created stack.
+ */
 Pilha *criaPilhaVazia()
 {
-    Pilha *pilha = (Pilha *)malloc(sizeof(Pilha));
-    pilha->topo = NULL;
-    pilha->quantidade = 0;
-    return pilha;
+    Pilha *novaPilha = (Pilha *)malloc(sizeof(Pilha));
+    novaPilha->topo = NULL;
+    novaPilha->quantidade = 0;
+    return novaPilha;
 }
 
+/**
+ * Creates a new item with the given value.
+ * 
+ * @param x The value of the item.
+ * @return A pointer to the newly created item.
+ */
 Item *criaItem(int x)
 {
     Item *novoItem = (Item *)malloc(sizeof(Item));
@@ -29,23 +40,63 @@ Item *criaItem(int x)
     return novoItem;
 }
 
+/**
+ * Frees the memory allocated for the stack and its items.
+ * 
+ * @param pilha A pointer to the stack to be freed.
+ */
 void liberaPilha(Pilha *pilha)
 {
-    Item *item = pilha->topo;
-    while (item != NULL)
+    Item *atual = pilha->topo;
+    while (atual != NULL)
     {
-        Item *temp = item;
-        item = item->prox;
+        Item *temp = atual;
+        atual = atual->prox;
         free(temp);
     }
     free(pilha);
 }
 
+/**
+ * Checks if the stack is empty.
+ * 
+ * @param pilha A pointer to the stack.
+ * @return 1 if the stack is empty, 0 otherwise.
+ */
 int vazia(Pilha *pilha)
 {
     return pilha->topo == NULL;
 }
 
+/**
+ * Prints the elements of the stack.
+ * 
+ * @param pilha A pointer to the stack.
+ */
+void imprimir(Pilha *pilha)
+{
+    Item *atual = pilha->topo;
+    if (atual != NULL)
+    {
+        while (atual != NULL)
+        {
+            printf("%d", atual->chave);
+            atual = atual->prox;
+            if (atual != NULL)
+            {
+                printf(" ");
+            }
+        }
+    }
+    printf("\n");
+}
+
+/**
+ * Pushes a new element onto the stack.
+ * 
+ * @param pilha A pointer to the stack.
+ * @param x The value to be pushed onto the stack.
+ */
 void empilha(Pilha *pilha, int x)
 {
     Item *novoItem = criaItem(x);
@@ -54,52 +105,53 @@ void empilha(Pilha *pilha, int x)
     pilha->quantidade++;
 }
 
+/**
+ * Removes and returns the top element from the stack.
+ * 
+ * @param pilha A pointer to the stack.
+ * @return The value of the top element, or -1 if the stack is empty.
+ */
 int desempilha(Pilha *pilha)
 {
     if (vazia(pilha))
     {
-        return -1;
+        return -1; // Pilha vazia
     }
-    Item *topoItem = pilha->topo;
-    int chave = topoItem->chave;
-    pilha->topo = topoItem->prox;
-    free(topoItem);
+    Item *temp = pilha->topo;
+    int chave = temp->chave;
+    pilha->topo = pilha->topo->prox;
     pilha->quantidade--;
+    free(temp);
     return chave;
-}
-
-void imprimir(Pilha *pilha)
-{
-    Item *item = pilha->topo;
-    while (item != NULL)
-    {
-        printf("%d ", item->chave);
-        item = item->prox;
-    }
-    printf("\n");
 }
 
 int main()
 {
-    Pilha *pilha = criaPilhaVazia();
     char op;
     int x;
+    Pilha *pilha = criaPilhaVazia();
+
     while (scanf(" %c", &op) != EOF)
     {
-        switch (op)
+        if (op == 'E')
         {
-        case 'E':
             scanf("%d", &x);
             empilha(pilha, x);
-            break;
-        case 'D':
-            desempilha(pilha);
-            break;
-        case 'M':
+        }
+        else if (op == 'D')
+        {
+            int desempilhado = desempilha(pilha);
+            if (desempilhado != -1)
+            {
+                printf("[%d]\n", desempilhado);
+            }
+        }
+        else if (op == 'M')
+        {
             imprimir(pilha);
-            break;
         }
     }
+
     liberaPilha(pilha);
     return 0;
 }

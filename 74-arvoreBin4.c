@@ -2,68 +2,108 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct tItem
+typedef struct No
 {
     int chave;
-    char palavra[21];
-    struct tItem *pai, *esq, *dir;
-} Item;
+    char valor[21];
+    struct No *esq, *dir;
+} No;
 
-typedef struct tArvore
+No *criarNo(char *valor)
 {
-    Item *raiz;
-} Arvore;
-
-int calculaChave(char *palavra)
-{
+    No *novo = (No *)malloc(sizeof(No));
     int chave = 0;
-    for (int i = 0; palavra[i] != '\0'; i++)
+    for (int i = 0; valor[i] != '\0'; i++)
     {
-        chave += palavra[i];
+        chave += (valor[i] * (i + 1)); // Cálculo da chave hash
     }
-    return chave;
+    novo->chave = chave;
+    strcpy(novo->valor, valor);
+    novo->esq = novo->dir = NULL;
+    return novo;
 }
 
-void inserirComPalavra(Arvore *arv, char *palavra)
+No *inserir(No *raiz, No *novo)
 {
-    int chave = calculaChave(palavra);
+    if (raiz == NULL)
+    {
+        return novo;
+    }
+    if (novo->chave < raiz->chave)
+    {
+        raiz->esq = inserir(raiz->esq, novo);
+    }
+    else if (novo->chave > raiz->chave)
+    {
+        raiz->dir = inserir(raiz->dir, novo);
+    }
+    // Ignora se a chave já existe
+    return raiz;
 }
+
+void imprimirPreOrder(No *raiz)
+{
+    if (raiz != NULL)
+    {
+        printf("[%d]:%s\n", raiz->chave, raiz->valor);
+        imprimirPreOrder(raiz->esq);
+        imprimirPreOrder(raiz->dir);
+    }
+}
+
+void imprimirInOrder(No *raiz)
+{
+    if (raiz != NULL)
+    {
+        imprimirInOrder(raiz->esq);
+        printf("[%d]:%s\n", raiz->chave, raiz->valor);
+        imprimirInOrder(raiz->dir);
+    }
+}
+
+void imprimirPostOrder(No *raiz)
+{
+    if (raiz != NULL)
+    {
+        imprimirPostOrder(raiz->esq);
+        imprimirPostOrder(raiz->dir);
+        printf("[%d]:%s\n", raiz->chave, raiz->valor);
+    }
+}
+
+// Adicione aqui as funções 'excluir', 'encontrarMin' e 'liberarArvore',
+// seguindo a lógica já estabelecida para a exclusão e liberação de nós.
 
 int main()
 {
-    char operacao[20];
-    char palavra[21];
-    Arvore *arv = criaArvoreVazia();
+    char comando[10], valor[21];
+    No *raiz = NULL;
 
-    while (scanf("%s", operacao) != EOF)
+    while (scanf("%s", comando) != EOF)
     {
-        if (strcmp(operacao, "insert") == 0)
+        if (strcmp(comando, "insert") == 0)
         {
-            scanf("%s", palavra);
-            inserirComPalavra(arv, palavra);
+            scanf("%s", valor);
+            raiz = inserir(raiz, criarNo(valor));
         }
-        else if (strcmp(operacao, "delete") == 0)
+        else if (strcmp(comando, "pre-order") == 0)
         {
-            scanf("%s", palavra);
+            imprimirPreOrder(raiz);
         }
-        else if (strcmp(operacao, "pre-order") == 0)
+        else if (strcmp(comando, "in-order") == 0)
         {
-            imprimirPreOrdem(arv->raiz);
-            printf("\n");
+            imprimirInOrder(raiz);
         }
-        else if (strcmp(operacao, "in-order") == 0)
+        else if (strcmp(comando, "post-order") == 0)
         {
-            imprimirInOrdem(arv->raiz);
-            printf("\n");
+            imprimirPostOrder(raiz);
         }
-        else if (strcmp(operacao, "post-order") == 0)
-        {
-            imprimirPosOrdem(arv->raiz);
-            printf("\n");
-        }
+        // Implemente a lógica para 'delete' aqui, usando a função 'excluir'.
     }
 
-    liberaArvore(arv->raiz);
-    free(arv);
+    // Liberar a memória alocada para a árvore antes de finalizar o programa.
+    // liberarArvore(raiz);
+
+    printf("\n");
     return 0;
 }

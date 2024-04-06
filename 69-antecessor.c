@@ -1,17 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct tItem
+typedef struct Item
 {
     int chave;
-    struct tItem *pai, *esq, *dir;
+    struct Item *esq, *dir;
 } Item;
 
-typedef struct tArvore
+typedef struct Arvore
 {
     Item *raiz;
 } Arvore;
 
+/**
+ * Creates an empty tree.
+ * 
+ * @return A pointer to the created tree.
+ */
 Arvore *criaArvoreVazia()
 {
     Arvore *arv = (Arvore *)malloc(sizeof(Arvore));
@@ -19,94 +24,135 @@ Arvore *criaArvoreVazia()
     return arv;
 }
 
-Item *criaItem(int x)
+/**
+ * Creates a new item with the given key.
+ * 
+ * @param chave The key of the item.
+ * @return A pointer to the created item.
+ */
+Item *novoItem(int chave)
 {
-    Item *novo = (Item *)malloc(sizeof(Item));
-    novo->chave = x;
-    novo->esq = NULL;
-    novo->dir = NULL;
-    novo->pai = NULL;
-    return novo;
+    Item *item = (Item *)malloc(sizeof(Item));
+    item->chave = chave;
+    item->esq = item->dir = NULL;
+    return item;
 }
 
-void inserirRec(Item **raiz, Item *novo, Item *pai)
+/**
+ * Recursively inserts a new item with the given key into the tree.
+ * 
+ * @param raiz The root of the tree.
+ * @param chave The key of the item to be inserted.
+ * @return The updated root of the tree.
+ */
+Item *inserirRec(Item *raiz, int chave)
 {
-    if (*raiz == NULL)
+    if (raiz == NULL)
     {
-        novo->pai = pai;
-        *raiz = novo;
+        return novoItem(chave);
     }
-    else if (novo->chave < (*raiz)->chave)
+    if (chave < raiz->chave)
     {
-        inserirRec(&((*raiz)->esq), novo, *raiz);
+        raiz->esq = inserirRec(raiz->esq, chave);
     }
-    else if (novo->chave > (*raiz)->chave)
+    else if (chave > raiz->chave)
     {
-        inserirRec(&((*raiz)->dir), novo, *raiz);
+        raiz->dir = inserirRec(raiz->dir, chave);
     }
+    return raiz;
 }
 
-void inserir(Arvore *arv, int x)
+/**
+ * Inserts a new item with the given key into the tree.
+ * 
+ * @param arv The tree.
+ * @param chave The key of the item to be inserted.
+ */
+void inserir(Arvore *arv, int chave)
 {
-    Item *novo = criaItem(x);
-    inserirRec(&(arv->raiz), novo, NULL);
+    arv->raiz = inserirRec(arv->raiz, chave);
 }
 
-Item *busca(Item *raiz, int x)
+/**
+ * Recursively searches for an item with the given key in the tree.
+ * 
+ * @param raiz The root of the tree.
+ * @param chave The key to search for.
+ * @return A pointer to the item if found, or NULL otherwise.
+ */
+Item *buscaPosicao(Item *raiz, int chave)
 {
-    if (raiz == NULL || raiz->chave == x)
+    if (raiz == NULL || raiz->chave == chave)
+    {
         return raiz;
-    if (x < raiz->chave)
-        return busca(raiz->esq, x);
-    else
-        return busca(raiz->dir, x);
+    }
+    if (chave < raiz->chave)
+    {
+        return buscaPosicao(raiz->esq, chave);
+    }
+    return buscaPosicao(raiz->dir, chave);
 }
 
-Item *antecessor(Item *i)
+/**
+ * Finds the maximum value in the subtree rooted at the given item.
+ * 
+ * @param item The root of the subtree.
+ * @return A pointer to the item with the maximum value.
+ */
+Item *maxValor(Item *item)
 {
-    if (i->esq != NULL)
+    Item *atual = item;
+    while (atual && atual->dir != NULL)
     {
-        Item *curr = i->esq;
-        while (curr->dir != NULL)
-        {
-            curr = curr->dir;
-        }
-        return curr;
+        atual = atual->dir;
     }
-    Item *p = i->pai;
-    while (p != NULL && i == p->esq)
-    {
-        i = p;
-        p = p->pai;
-    }
-    return p;
+    return atual;
 }
 
-void imprimirInOrdem(Item *raiz)
+/**
+ * Finds the predecessor of the given item.
+ * 
+ * @param item The item.
+ * @return A pointer to the predecessor item, or NULL if it doesn't exist.
+ */
+Item *antecessor(Item *item)
+{
+    if (item == NULL || item->esq == NULL)
+    {
+        return NULL;
+    }
+    return maxValor(item->esq);
+}
+
+/**
+ * Prints the items in the tree in ascending order.
+ * 
+ * @param raiz The root of the tree.
+ */
+void imprimirEmOrdem(Item *raiz)
 {
     if (raiz != NULL)
     {
-        imprimirInOrdem(raiz->esq);
+        imprimirEmOrdem(raiz->esq);
         printf("%d ", raiz->chave);
-        imprimirInOrdem(raiz->dir);
+        imprimirEmOrdem(raiz->dir);
     }
 }
 
-void liberaItem(Item *item)
+/**
+ * Frees the memory allocated for the items in the tree in post-order traversal.
+ * 
+ * @param raiz The root of the tree.
+ */
+void liberaPosOrdem(Item *raiz)
 {
-    if (item != NULL)
+    if (raiz != NULL)
     {
-        liberaItem(item->esq);
-        liberaItem(item->dir);
-        printf("libera: %d\n", item->chave);
-        free(item);
+        liberaPosOrdem(raiz->esq);
+        liberaPosOrdem(raiz->dir);
+        printf("libera: %d\n", raiz->chave);
+        free(raiz);
     }
-}
-
-void liberaArvore(Arvore *arv)
-{
-    liberaItem(arv->raiz);
-    free(arv);
 }
 
 int main()
@@ -119,12 +165,11 @@ int main()
         scanf("%d", &x);
         inserir(arv, x);
     }
-    imprimirInOrdem(arv->raiz);
+    imprimirEmOrdem(arv->raiz);
     printf("\n");
-
     while (scanf("%d", &x) != EOF)
     {
-        Item *it = busca(arv->raiz, x);
+        Item *it = buscaPosicao(arv->raiz, x);
         if (it != NULL)
         {
             Item *ant = antecessor(it);
@@ -142,7 +187,7 @@ int main()
             printf("Chave nao encontrada.\n");
         }
     }
-
-    liberaArvore(arv);
+    liberaPosOrdem(arv->raiz);
+    free(arv);
     return 0;
 }

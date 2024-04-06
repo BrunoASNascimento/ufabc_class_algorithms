@@ -27,18 +27,13 @@ gcc filename.c -o filename -lm
 ```
 
 ## For revision:
+
 ### Total:
-- 38-fila.c
-- 39-filaCircular.c
-- 40-LESint.c
+
 - 41-LESchar.c
-- 45-pilha.c
-- 46-fila.c
-- 47-ldde.c
-- 59-maxHeap2.c
-- 67-mostraFolhas.c
 - 73-arvoreBin3.c
 - 74-arvoreBin4.c
+
 ### Partial:
-- 68-sucessor.c
-- 69-antecessor.c
+
+- 38-fila.c

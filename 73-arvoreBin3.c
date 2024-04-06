@@ -2,129 +2,163 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct tItem
+typedef struct No
 {
-    char chave;
-    struct tItem *pai, *esq, *dir;
-} Item;
+    char valor;
+    struct No *esq, *dir;
+} No;
 
-typedef struct tArvore
-{
-    Item *raiz;
-} Arvore;
-
-Arvore *criaArvoreVazia()
-{
-    Arvore *novaArvore = (Arvore *)malloc(sizeof(Arvore));
-    novaArvore->raiz = NULL;
-    return novaArvore;
-}
-
-Item *criaItem(char chave)
-{
-    Item *novoItem = (Item *)malloc(sizeof(Item));
-    novoItem->chave = chave;
-    novoItem->esq = novoItem->dir = novoItem->pai = NULL;
-    return novoItem;
-}
-
-Item *insereItem(Item *raiz, char chave, Item *pai)
+No *inserir(No *raiz, char valor)
 {
     if (raiz == NULL)
     {
-        raiz = criaItem(chave);
-        raiz->pai = pai;
+        No *novo = (No *)malloc(sizeof(No));
+        novo->valor = valor;
+        novo->esq = novo->dir = NULL;
+        return novo;
     }
-    else if (chave <= raiz->chave)
+    else if (valor < raiz->valor)
     {
-        raiz->dir = insereItem(raiz->dir, chave, raiz);
+        raiz->esq = inserir(raiz->esq, valor);
     }
     else
-    {
-        raiz->esq = insereItem(raiz->esq, chave, raiz);
+    { // Inclui valores iguais na subárvore direita
+        raiz->dir = inserir(raiz->dir, valor);
     }
     return raiz;
 }
 
-void inserir(Arvore *arv, char chave)
+No *encontrarMin(No *raiz)
 {
-    arv->raiz = insereItem(arv->raiz, chave, NULL);
+    while (raiz->esq != NULL)
+        raiz = raiz->esq;
+    return raiz;
 }
 
-void imprimirPreOrdem(Item *raiz)
+No *excluir(No *raiz, char valor)
+{
+    if (raiz == NULL)
+        return raiz; // Caso base
+    if (valor < raiz->valor)
+    { // Valor está na subárvore esquerda
+        raiz->esq = excluir(raiz->esq, valor);
+    }
+    else if (valor > raiz->valor)
+    { // Valor está na subárvore direita
+        raiz->dir = excluir(raiz->dir, valor);
+    }
+    else
+    {
+        // Nó com apenas um filho ou sem filhos
+        if (raiz->esq == NULL)
+        {
+            No *temp = raiz->dir;
+            if (raiz != NULL)
+            {
+                free(raiz);
+            }
+            
+            return temp;
+        }
+        else if (raiz->dir == NULL)
+        {
+            No *temp = raiz->esq;
+            if (raiz != NULL)
+            {
+                free(raiz);
+            }
+            return temp;
+        }
+
+        // Nó com dois filhos: Pegue o sucessor in-order (menor na subárvore direita)
+        No *temp = encontrarMin(raiz->dir);
+
+        // Copia o valor do sucessor in-order para este nó
+        raiz->valor = temp->valor;
+
+        // Deleta o sucessor in-order
+        raiz->dir = excluir(raiz->dir, temp->valor);
+    }
+    return raiz;
+}
+
+void imprimirPreOrder(No *raiz)
 {
     if (raiz != NULL)
     {
-        printf("%c ", raiz->chave);
-        imprimirPreOrdem(raiz->esq);
-        imprimirPreOrdem(raiz->dir);
+        printf("%c ", raiz->valor);
+        imprimirPreOrder(raiz->esq);
+        imprimirPreOrder(raiz->dir);
     }
 }
 
-void imprimirInOrdem(Item *raiz)
+void imprimirInOrder(No *raiz)
 {
     if (raiz != NULL)
     {
-        imprimirInOrdem(raiz->esq);
-        printf("%c ", raiz->chave);
-        imprimirInOrdem(raiz->dir);
+        imprimirInOrder(raiz->esq);
+        printf("%c ", raiz->valor);
+        imprimirInOrder(raiz->dir);
     }
 }
 
-void imprimirPosOrdem(Item *raiz)
+void imprimirPostOrder(No *raiz)
 {
     if (raiz != NULL)
     {
-        imprimirPosOrdem(raiz->esq);
-        imprimirPosOrdem(raiz->dir);
-        printf("%c ", raiz->chave);
+        imprimirPostOrder(raiz->esq);
+        imprimirPostOrder(raiz->dir);
+        printf("%c ", raiz->valor);
     }
 }
 
-void liberaArvore(Item *raiz)
+void liberarArvore(No *raiz)
 {
     if (raiz != NULL)
     {
-        liberaArvore(raiz->esq);
-        liberaArvore(raiz->dir);
+        liberarArvore(raiz->esq);
+        liberarArvore(raiz->dir);
         free(raiz);
     }
 }
 
 int main()
 {
-    char comando[20];
+    char comando[10];
     char valor;
-    Arvore *arv = criaArvoreVazia();
+    No *raiz = NULL;
+
     while (scanf("%s", comando) != EOF)
     {
         if (strcmp(comando, "insert") == 0)
         {
             scanf(" %c", &valor);
-            inserir(arv, valor);
+            raiz = inserir(raiz, valor);
         }
         else if (strcmp(comando, "delete") == 0)
         {
             scanf(" %c", &valor);
-            // A função de remoção não está implementada neste exemplo
+
+            raiz = excluir(raiz, valor);
         }
         else if (strcmp(comando, "pre-order") == 0)
         {
-            imprimirPreOrdem(arv->raiz);
+            imprimirPreOrder(raiz);
             printf("\n");
         }
         else if (strcmp(comando, "in-order") == 0)
         {
-            imprimirInOrdem(arv->raiz);
+            imprimirInOrder(raiz);
             printf("\n");
         }
         else if (strcmp(comando, "post-order") == 0)
         {
-            imprimirPosOrdem(arv->raiz);
+            imprimirPostOrder(raiz);
             printf("\n");
         }
     }
-    liberaArvore(arv->raiz);
-    free(arv);
+
+    liberarArvore(raiz);
+    printf("\n"); // Salta uma linha antes de finalizar o programa
     return 0;
 }

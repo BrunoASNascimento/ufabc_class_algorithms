@@ -1,17 +1,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct tItem
+typedef struct Item
 {
     int chave;
-    struct tItem *pai, *esq, *dir;
+    struct Item *esq, *dir;
 } Item;
 
-typedef struct tArvore
+typedef struct Arvore
 {
     Item *raiz;
 } Arvore;
 
+/**
+ * Creates an empty tree.
+ * 
+ * @return A pointer to the created tree.
+ */
 Arvore *criaArvoreVazia()
 {
     Arvore *arv = (Arvore *)malloc(sizeof(Arvore));
@@ -19,97 +24,135 @@ Arvore *criaArvoreVazia()
     return arv;
 }
 
-Item *criaItem(int x)
+/**
+ * Creates a new item with the given key.
+ * 
+ * @param chave The key of the item.
+ * @return A pointer to the created item.
+ */
+Item *novoItem(int chave)
 {
-    Item *novo = (Item *)malloc(sizeof(Item));
-    novo->chave = x;
-    novo->esq = NULL;
-    novo->dir = NULL;
-    novo->pai = NULL;
-    return novo;
+    Item *item = (Item *)malloc(sizeof(Item));
+    item->chave = chave;
+    item->esq = item->dir = NULL;
+    return item;
 }
 
-Item *busca(Item *raiz, int x)
+/**
+ * Recursively inserts a new item with the given key into the tree.
+ * 
+ * @param raiz The root of the tree.
+ * @param chave The key of the item to be inserted.
+ * @return The updated root of the tree.
+ */
+Item *inserirRec(Item *raiz, int chave)
 {
-    if (raiz == NULL || raiz->chave == x)
+    if (raiz == NULL)
+    {
+        return novoItem(chave);
+    }
+    if (chave < raiz->chave)
+    {
+        raiz->esq = inserirRec(raiz->esq, chave);
+    }
+    else if (chave > raiz->chave)
+    {
+        raiz->dir = inserirRec(raiz->dir, chave);
+    }
+    return raiz;
+}
+
+/**
+ * Inserts a new item with the given key into the tree.
+ * 
+ * @param arv The tree.
+ * @param chave The key of the item to be inserted.
+ */
+void inserir(Arvore *arv, int chave)
+{
+    arv->raiz = inserirRec(arv->raiz, chave);
+}
+
+/**
+ * Recursively searches for an item with the given key in the tree.
+ * 
+ * @param raiz The root of the tree.
+ * @param chave The key to search for.
+ * @return A pointer to the item if found, NULL otherwise.
+ */
+Item *buscaPosicao(Item *raiz, int chave)
+{
+    if (raiz == NULL || raiz->chave == chave)
+    {
         return raiz;
-    if (x < raiz->chave)
-        return busca(raiz->esq, x);
-    else
-        return busca(raiz->dir, x);
+    }
+    if (chave < raiz->chave)
+    {
+        return buscaPosicao(raiz->esq, chave);
+    }
+    return buscaPosicao(raiz->dir, chave);
 }
 
-void inserirRec(Item **raiz, Item *novo, Item *pai)
+/**
+ * Finds the minimum value item in the tree rooted at the given item.
+ * 
+ * @param item The root of the tree.
+ * @return A pointer to the minimum value item.
+ */
+Item *minValor(Item *item)
 {
-    if (*raiz == NULL)
+    Item *atual = item;
+    while (atual && atual->esq != NULL)
     {
-        novo->pai = pai;
-        *raiz = novo;
+        atual = atual->esq;
     }
-    else if (novo->chave < (*raiz)->chave)
-    {
-        inserirRec(&((*raiz)->esq), novo, *raiz);
-    }
-    else if (novo->chave > (*raiz)->chave)
-    {
-        inserirRec(&((*raiz)->dir), novo, *raiz);
-    }
+    return atual;
 }
 
-void inserir(Arvore *arv, int x)
+/**
+ * Finds the successor of the given item in the tree.
+ * 
+ * @param item The item.
+ * @return A pointer to the successor item if it exists, NULL otherwise.
+ */
+Item *sucessor(Item *item)
 {
-    Item *novo = criaItem(x);
-    inserirRec(&(arv->raiz), novo, NULL);
-}
-
-Item *sucessor(Item *i)
-{
-    if (i->dir != NULL)
-    {   
-        // printf("i->dir->chave: %d\n", i->dir->chave);
-        Item *curr = i->dir;
-        while (curr->esq != NULL)
-        {
-            curr = curr->esq;
-        }
-        return curr;
-    }
-    Item *p = i->pai;
-    // printf("p->chave: %d\n", p->chave);
-    while (p != NULL && i == p->dir )
+    if (item == NULL || item->dir == NULL)
     {
-        // printf("p->chave while: %d\n", p->chave);
-        i = p;
-        p = p->pai;
+        return NULL;
     }
-    // return p;
+    return minValor(item->dir);
 }
 
-void imprimirInOrdem(Item *raiz)
+/**
+ * Prints the items in the tree in ascending order.
+ * 
+ * @param raiz The root of the tree.
+ */
+void imprimirEmOrdem(Item *raiz)
 {
     if (raiz != NULL)
     {
-        imprimirInOrdem(raiz->esq);
+        imprimirEmOrdem(raiz->esq);
         printf("%d ", raiz->chave);
-        imprimirInOrdem(raiz->dir);
+        imprimirEmOrdem(raiz->dir);
     }
 }
 
-void liberaItem(Item *item)
+/**
+ * Frees the memory allocated for the items in the tree in post-order traversal.
+ * 
+ * @param raiz The root of the tree.
+ */
+void liberaPosOrdem(Item *raiz)
 {
-    if (item != NULL)
+    if (raiz != NULL)
     {
-        liberaItem(item->esq);
-        liberaItem(item->dir);
-        printf("libera: %d\n", item->chave);
-        free(item);
+        liberaPosOrdem(raiz->esq);
+        liberaPosOrdem(raiz->dir);
+        printf("libera: %d\n", raiz->chave);
+        free(raiz);
     }
-}
-
-void liberaArvore(Arvore *arv)
-{
-    liberaItem(arv->raiz);
-    free(arv);
 }
 
 int main()
@@ -122,10 +165,11 @@ int main()
         scanf("%d", &x);
         inserir(arv, x);
     }
-
+    imprimirEmOrdem(arv->raiz);
+    printf("\n");
     while (scanf("%d", &x) != EOF)
     {
-        Item *it = busca(arv->raiz, x);
+        Item *it = buscaPosicao(arv->raiz, x);
         if (it != NULL)
         {
             Item *suc = sucessor(it);
@@ -143,54 +187,7 @@ int main()
             printf("Chave nao encontrada.\n");
         }
     }
-
-    liberaArvore(arv);
+    liberaPosOrdem(arv->raiz);
+    free(arv);
     return 0;
 }
-
-
-// --- Input ---
-// 7
-// 3 2 5 1 4 6 7
-// 1
-// 2
-// 3
-// 4
-// 5
-// 6
-// 7
-// 8
-
-// --- Program output ---
-// Nao ha sucessor para a chave pesquisada.
-// Sucessor de 2: 5
-// Sucessor de 3: 4
-// Sucessor de 4: 6
-// Sucessor de 5: 6
-// Sucessor de 6: 7
-// Nao ha sucessor para a chave pesquisada.
-// Chave nao encontrada.
-// libera: 1
-// libera: 2
-// libera: 4
-// libera: 7
-// libera: 6
-// libera: 5
-// libera: 3
-
-// --- Expected output (text)---
-// Nao ha sucessor para a chave pesquisada.
-// Nao ha sucessor para a chave pesquisada.
-// Sucessor de 3: 4
-// Nao ha sucessor para a chave pesquisada.
-// Sucessor de 5: 6
-// Sucessor de 6: 7
-// Nao ha sucessor para a chave pesquisada.
-// Chave nao encontrada.
-// libera: 1
-// libera: 2
-// libera: 4
-// libera: 7
-// libera: 6
-// libera: 5
-// libera: 3

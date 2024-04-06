@@ -3,11 +3,17 @@
 
 typedef struct tHeap
 {
-    int *v;
-    int tamanho;   
-    int quantidade;
+    int *v; // Array to store the heap elements
+    int tamanho; // Maximum size of the heap
+    int quantidade; // Current number of elements in the heap
 } Heap;
 
+/**
+ * Creates an empty heap with the given maximum size.
+ * 
+ * @param tam The maximum size of the heap
+ * @return A pointer to the created heap
+ */
 Heap *criaHeapVazio(int tam)
 {
     Heap *h = (Heap *)malloc(sizeof(Heap));
@@ -17,61 +23,182 @@ Heap *criaHeapVazio(int tam)
     return h;
 }
 
+/**
+ * Frees the memory allocated for the heap.
+ * 
+ * @param h A pointer to the heap to be freed
+ */
 void liberaHeap(Heap *h)
 {
     free(h->v);
     free(h);
 }
 
-int pai(int i) { return (i - 1) / 2; }
-
-int filhoEsq(int i) { return (2 * i) + 1; }
-
-int filhoDir(int i) { return (2 * i) + 2; }
-
-void troca(int *a, int *b)
+/**
+ * Returns the index of the parent of the element at index i.
+ * 
+ * @param i The index of the element
+ * @return The index of the parent element
+ */
+int pai(int i)
 {
-    int t = *a;
-    *a = *b;
-    *b = t;
+    return (i - 1) / 2;
 }
 
+/**
+ * Returns the index of the right child of the element at index i.
+ * 
+ * @param i The index of the element
+ * @return The index of the right child element
+ */
+int filhoDir(int i)
+{
+    return 2 * i + 2;
+}
+
+/**
+ * Returns the index of the left child of the element at index i.
+ * 
+ * @param i The index of the element
+ * @return The index of the left child element
+ */
+int filhoEsq(int i)
+{
+    return 2 * i + 1;
+}
+
+/**
+ * Returns the index of the last parent element in the heap.
+ * 
+ * @param h A pointer to the heap
+ * @return The index of the last parent element
+ */
+int ultimoPai(Heap *h)
+{
+    return pai(h->quantidade - 1);
+}
+
+/**
+ * Moves the element at index i down the heap until it reaches its correct position.
+ * 
+ * @param h A pointer to the heap
+ * @param i The index of the element to be moved down
+ */
 void desceChave(Heap *h, int i)
 {
-    int esq = filhoEsq(i), dir = filhoDir(i), maior = i;
+    int maior = i;
+    int esq = filhoEsq(i);
+    int dir = filhoDir(i);
+
     if (esq < h->quantidade && h->v[esq] > h->v[maior])
+    {
         maior = esq;
+    }
     if (dir < h->quantidade && h->v[dir] > h->v[maior])
+    {
         maior = dir;
+    }
+
     if (maior != i)
     {
-        troca(&h->v[i], &h->v[maior]);
+        int temp = h->v[i];
+        h->v[i] = h->v[maior];
+        h->v[maior] = temp;
         desceChave(h, maior);
     }
 }
 
+/**
+ * Builds a heap from the given array of elements.
+ * 
+ * @param h A pointer to the heap
+ */
+void constroiHeap(Heap *h)
+{
+    for (int i = ultimoPai(h); i >= 0; i--)
+    {
+        desceChave(h, i);
+    }
+}
+
+/**
+ * Prints the elements of the array.
+ * 
+ * @param v The array of elements
+ * @param n The number of elements to be printed
+ */
+void imprime(int *v, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        printf("%d ", v[i]);
+    }
+    printf("\n");
+}
+
+/**
+ * Checks if the heap is empty.
+ * 
+ * @param h A pointer to the heap
+ * @return 1 if the heap is empty, 0 otherwise
+ */
+int vazio(Heap *h)
+{
+    return h->quantidade == 0;
+}
+
+/**
+ * Checks if the heap is full.
+ * 
+ * @param h A pointer to the heap
+ * @return 1 if the heap is full, 0 otherwise
+ */
+int cheio(Heap *h)
+{
+    return h->quantidade == h->tamanho;
+}
+
+/**
+ * Moves the element at index i up the heap until it reaches its correct position.
+ * 
+ * @param h A pointer to the heap
+ * @param i The index of the element to be moved up
+ */
 void sobeChave(Heap *h, int i)
 {
     while (i != 0 && h->v[pai(i)] < h->v[i])
     {
-        troca(&h->v[i], &h->v[pai(i)]);
+        int temp = h->v[i];
+        h->v[i] = h->v[pai(i)];
+        h->v[pai(i)] = temp;
         i = pai(i);
     }
 }
 
+/**
+ * Inserts a new element into the heap.
+ * 
+ * @param h A pointer to the heap
+ * @param x The element to be inserted
+ */
 void inserir(Heap *h, int x)
 {
-    if (h->quantidade < h->tamanho)
+    if (!cheio(h))
     {
-        h->v[h->quantidade] = x;
-        h->quantidade++;
+        h->v[h->quantidade++] = x;
         sobeChave(h, h->quantidade - 1);
     }
 }
 
+/**
+ * Removes the maximum element from the heap.
+ * 
+ * @param h A pointer to the heap
+ * @return The maximum element, or -1 if the heap is empty
+ */
 int extraiMaximo(Heap *h)
 {
-    if (h->quantidade > 0)
+    if (!vazio(h))
     {
         int maximo = h->v[0];
         h->v[0] = h->v[h->quantidade - 1];
@@ -79,25 +206,38 @@ int extraiMaximo(Heap *h)
         desceChave(h, 0);
         return maximo;
     }
-    return -1;
+    return -1; // Heap vazio
 }
 
-void imprime(Heap *h)
+/**
+ * Removes the first occurrence of the element x from the heap.
+ * 
+ * @param h A pointer to the heap
+ * @param x The element to be removed
+ */
+void remover(Heap *h, int x)
 {
-    for (int i = 0; i < h->quantidade; i++)
+    int i;
+    for (i = 0; i < h->quantidade; i++)
     {
-        printf("%d ", h->v[i]);
+        if (h->v[i] == x)
+        {
+            h->v[i] = h->v[h->quantidade - 1];
+            h->quantidade--;
+            sobeChave(h, i);
+            desceChave(h, i);
+            break;
+        }
     }
-    printf("\n");
 }
 
 int main()
 {
-    int tam, x;
-    char op;
+    int tam;
     scanf("%d", &tam);
     Heap *h = criaHeapVazio(tam);
-
+    char op;
+    int x;
     while (scanf(" %c", &op) != EOF)
     {
         switch (op)
@@ -106,97 +246,25 @@ int main()
             scanf("%d", &x);
             inserir(h, x);
             break;
+        case 'R':
+            scanf("%d", &x);
+            remover(h, x);
+            break;
         case 'E':
-            printf("[%d]\n", extraiMaximo(h));
+            if (!vazio(h))
+            {
+                x = extraiMaximo(h);
+                printf("[%d]\n", x);
+            }
             break;
         case 'P':
-            imprime(h);
+            if (!vazio(h))
+            {
+                imprime(h->v, h->quantidade);
+            }
             break;
         }
     }
-
     liberaHeap(h);
     return 0;
 }
-
-
-// --- Input ---
-// 10
-// I 50
-// P
-// I 30
-// P
-// I 70
-// P
-// I 90
-// P
-// I 10
-// P
-// I 20
-// P
-// I 40
-// P
-// I 80
-// P
-// I 60
-// P
-// I 50
-// P
-// E
-// P
-// R 50
-// P
-// E
-// P
-// E
-// P
-// R 50
-// P
-// E
-// P
-// E
-// P
-// E
-// P
-// E
-// P
-// E
-// P
-// I 111
-// P
-// I 222
-// P
-// I 5
-// P
-
-// --- Expected output (text)---
-// 50
-// 50 30
-// 70 30 50
-// 90 70 50 30
-// 90 70 50 30 10
-// 90 70 50 30 10 20
-// 90 70 50 30 10 20 40
-// 90 80 50 70 10 20 40 30
-// 90 80 50 70 10 20 40 30 60
-// 90 80 50 70 50 20 40 30 60 10
-// [90]
-// 80 70 50 60 50 20 40 30 10
-// 80 70 40 60 50 20 10 30
-// [80]
-// 70 60 40 30 50 20 10
-// [70]
-// 60 50 40 30 10 20
-// 60 30 40 20 10
-// [60]
-// 40 30 10 20
-// [40]
-// 30 20 10
-// [30]
-// 20 10
-// [20]
-// 10
-// [10]
-// 111
-// 222 111
-// 222 111 5
