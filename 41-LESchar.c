@@ -1,96 +1,145 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX 30000
-
-typedef struct
+typedef struct tList
 {
-    char itens[MAX];
-    int qtd;
-} Lista;
+    char *items;
+    int count;
+    int size;
+} List;
 
-void criaLista(Lista *lista)
+List *createEmptyList(int size)
 {
-    lista->qtd = 0;
+    List *list = malloc(sizeof(List));
+    list->items = malloc(sizeof(char) * size);
+    list->size = size;
+    list->count = 0;
+    return list;
 }
 
-int busca(Lista *lista, char valor)
+void freeList(List *list)
 {
-    for (int i = 0; i < lista->qtd; i++)
+    free(list->items);
+    free(list);
+}
+
+int isFull(List *list)
+{
+    return list->count == list->size;
+}
+
+int isEmpty(List *list)
+{
+    return list->count == 0;
+}
+
+int findPosition(List *list, char x)
+{
+    int i = 0;
+    while (i < list->count && list->items[i] < x)
     {
-        if (lista->itens[i] == valor)
+        i++;
+    }
+    return i;
+}
+
+void insert(List *list, char x)
+{
+    if (!isFull(list))
+    {
+        int i = findPosition(list, x), j;
+        if (i == list->count || list->items[i] != x)
         {
-            return i; // Retorna a posição se encontrar o valor
+
+            for (j = list->count; j > i; j--)
+            {
+                list->items[j] = list->items[j - 1];
+            }
+            list->items[j] = x;
+            list->count++;
         }
     }
-    return -1; // Retorna -1 se não encontrar
 }
 
-void insere(Lista *lista, char valor)
+void removeItem(List *list, char x)
 {
-    if (lista->qtd >= MAX || busca(lista, valor) != -1)
+    if (!isEmpty(list))
     {
-        return; // Ignora se a lista estiver cheia ou o valor já existir
-    }
+        int i = findPosition(list, x), j;
+        if (i < list->count && list->items[i] == x)
+        {
 
-    // Inserção ordenada
-    int pos;
-    for (pos = lista->qtd; pos > 0 && lista->itens[pos - 1] > valor; pos--)
-    {
-        lista->itens[pos] = lista->itens[pos - 1];
+            for (j = i; j < list->count; j++)
+            {
+                list->items[j] = list->items[j + 1];
+            }
+            list->count--;
+        }
     }
-    lista->itens[pos] = valor;
-    lista->qtd++;
 }
 
-void removeValor(Lista *lista, char valor)
+void printList(List *list)
 {
-    int pos = busca(lista, valor);
-    if (pos == -1)
+    if (!isEmpty(list))
     {
-        return; // Ignora se não encontrar o valor
+        int i;
+        for (i = 0; i < list->count - 1; i++)
+        {
+            printf("%c ", list->items[i]);
+        }
+        printf("%c\n", list->items[list->count - 1]);
     }
-
-    for (int i = pos; i < lista->qtd - 1; i++)
-    {
-        lista->itens[i] = lista->itens[i + 1];
-    }
-    lista->qtd--;
 }
 
-void imprimeLista(Lista *lista)
+int search(List *list, char x)
 {
-    for (int i = 0; i < lista->qtd; i++)
+    int i;
+
+    for (i = 0; i < list->count; i++)
     {
-        printf("%c ", lista->itens[i]);
+        if (list->items[i] == x)
+        {
+            return 1;
+        }
     }
-    printf("\n");
+    return 0;
 }
 
 int main()
 {
-    char operacao, valor;
-    Lista lista;
-    criaLista(&lista);
+    int n, i;
+    char x, op;
+    scanf("%d", &n);
+    List *list = createEmptyList(n);
 
-    while (scanf(" %c %c", &operacao, &valor) != EOF)
+    while (scanf(" %c", &op) != EOF)
     {
-        switch (operacao)
+        switch (op)
         {
-        case 'I':
-            insere(&lista, valor);
+        case 'B':
+            scanf(" %c", &x);
+            if (search(list, x))
+            {
+                printf("SIM\n");
+            }
+            else
+            {
+                printf("NAO\n");
+            }
             break;
         case 'R':
-            removeValor(&lista, valor);
+            scanf(" %c", &x);
+            removeItem(list, x);
             break;
-        case 'B':
-            printf("%s\n", busca(&lista, valor) != -1 ? "SIM" : "NAO");
+        case 'I':
+            scanf(" %c", &x);
+            insert(list, x);
             break;
         case 'M':
-            imprimeLista(&lista);
+            printList(list);
             break;
         }
     }
-
+    freeList(list);
     return 0;
 }

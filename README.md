@@ -30,7 +30,6 @@ gcc filename.c -o filename -lm
 
 ### Total:
 
-- 41-LESchar.c
 - 73-arvoreBin3.c
 - 74-arvoreBin4.c
 
