@@ -25,3 +25,14 @@ To compile and run:
 gcc filename.c -o filename -lm
 ./filename
 ```
+
+## For revision:
+
+### Total:
+
+- 73-arvoreBin3.c
+- 74-arvoreBin4.c
+
+### Partial:
+
+- 38-fila.c
